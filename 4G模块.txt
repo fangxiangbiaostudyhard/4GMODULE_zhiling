@@ -1,0 +1,211 @@
+波特率：
+115200
+
+
+
+
+
+
+
+
+
+
+
+
+
+发短信：
+AT+CMGF=1
+OK
+AT+CSCS="GSM"
+OK
+AT+CMGS="18543444164"
+> 
+SOS
+location:
+w:111.111;w:123.234:
+
+
+十六进制：1a
+确认发送
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AT+CSCA="+8613800451500",145
+AT+CSCA?
++CSCA: "+8613800451500",145
+
+
+
+
+
+
+发送中文：
+设置短信为文本模式： 
+AT+CMGF=1
+
+设置字符集为 UCS2： 
+AT+CSCS="UCS2"
+
+设置短信文本参数（关键）： 
+AT+CSMP=17,167,0,8
+
+18543444164 转换为 UCS2： "00310038003500340033003400340034003100360034"
+你好 转换为 UCS2： 4F60517B
+
+输入发送指令： 输入：
+AT+CMGS="00310038003500340033003400340034003100360034" 
+然后按下 回车 (Enter)。
+
+
+等待回显： 串口助手会返回一个符号：>
+
+输入内容： 紧接着在 > 后面输入  你好   转换过来的UCS2编码：4F60517B
+
+结束并发送： 在串口助手中，通过 十六进制(HEX)模式 发送一个字节：1A (这代表 Ctrl+Z)。 或者，大部分串口助手有一个“发送新行”勾选框，不勾选它，直接按 Ctrl+Z 组合键（如果助手支持的话）。
+
+
+
+
+
+
+
+
+
+使用以下程序转换编码：
+def to_ucs2_hex(text):
+    """
+    将任何文本（中文、数字、英文）转换为大端序的 UCS2 十六进制字符串
+    """
+    # utf-16-be 对应大端序的 UCS2
+    return text.encode('utf-16-be').hex().upper()
+
+
+def generate_at_commands(phone, message):
+    """
+    直接生成可用于串口助手粘贴的指令
+    """
+    ucs2_phone = to_ucs2_hex(phone)
+    ucs2_msg = to_ucs2_hex(message)
+
+    print("--- 转换结果 ---")
+    print(f"原始号码: {phone}")
+    print(f"UCS2号码: {ucs2_phone}")
+    print(f"原始短信: {message}")
+    print(f"UCS2内容: {ucs2_msg}")
+    print("\n--- 串口助手操作步骤 ---")
+    print(f"1. 输入指令: AT+CMGS=\"{ucs2_phone}\"")
+    print(f"2. 出现 > 后输入内容: {ucs2_msg}")
+    print(f"3. 最后发送十六进制: 1A (即 Ctrl+Z)")
+
+
+# --- 测试使用 ---
+if __name__ == "__main__":
+    target_phone = "18746554636"
+    target_message = "丁一丁"
+
+    generate_at_commands(target_phone, target_message)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+获得GPS位置信息：
+AT
+
+OK
+AT+QGPS=?
+
++QGPS: (0-1)
+
+OK
+AT+QGPS?
+
++QGPS: 0
+
+OK
+AT+QGPS=1
+
+OK
+AT+QGPSLOC=?
+
++QGPSLOC: <UTC>,<latitude>,<longitude>,<HDOP>,<altitude>,<fix>,<COG>,<spkm>,<spkn>,<date>,<nsat>
+
+OK
+AT+QGPSLOC=0
+
++QGPSLOC: 121540.00,4542.6697N,12636.5093E,4.59,227.6,3,,1.166,0.639,301225,05
+
+OK
+AT+QGPSLOC=1
+
++QGPSLOC: 121546.00,4542.654900,N,12636.548330,E,3.19,206.5,3,,0.506,0.277,301225,07
+
+OK
+AT+QGPSLOC=2
+
++QGPSLOC: 121558.00,45.71077,126.60948,3.56,200.1,3,,0.819,0.449,301225,08
+
+OK
+
+
+
+
+
+最简化版本：
+AT
+AT+QGPS=1
+AT+QGPSLOC=2
+
+
+
+
+AT+QGPSLOC=2
+
++QGPSLOC: 122201.00,45.71083,126.60955,3.45,212.8,3,,1.119,0.613,301225,04
+
+
+在 十进制度表示法里：
+
+纬度
+
+正数 → 北纬（N）
+
+负数 → 南纬（S）
+
+经度
+
+正数 → 东经（E）
+
+负数 → 西经（W）
+
+
+
+
+
